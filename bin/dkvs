@@ -21,8 +21,7 @@ while true
   # deserialize
   memory_store = Marshal.load(file_contents)
   puts "------------------------"
-  print "input: "
-  input = $stdin.gets.chomp
+  input = Readline.readline("input: ", true).chomp
   command, args = input.split
   case command
   when "GET"
