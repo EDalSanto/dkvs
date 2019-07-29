@@ -6,24 +6,28 @@ require_relative "request_handler"
 require "pry"
 
 class Server
+  attr_accessor :file_store
   STORE_FILE_NAME = "/tmp/store"
   SOCKET_NAME = "/tmp/dkvs.sock"
 
-  def run
+  def initialize
     begin # ensure socket free
       File.unlink(SOCKET_NAME)
     rescue Errno::ENOENT
       puts "socket not present, skipping unlink"
     end
     # open file for appends / reads
-    file_store = File.open(STORE_FILE_NAME, "a+")
+    self.file_store = File.open(STORE_FILE_NAME, "a+")
     if file_store.size.zero?
       # init file with serialized content
       init_data = Marshal.dump({})
       file_store.write(init_data)
       file_store.rewind
     end
-    # accept connections to clients
+  end
+
+  def run
+    # open listening socket
     server = UNIXServer.new(SOCKET_NAME)
     while true
       # handle multiple client requests
