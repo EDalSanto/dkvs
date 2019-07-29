@@ -25,16 +25,17 @@ class Server
     end
     # accept connections to clients
     server = UNIXServer.new(SOCKET_NAME)
-    client, _client_addrinfo = server.accept
     while true
-      request = client.recv(20).chomp
-      p "request: #{request}"
-      result = RequestHandler.call(request, file_store)
-      client.puts(result)
-      # TODO: multiple client requests..threads?
+      # handle multiple client requests
+      Thread.start(server.accept) do |client|
+        request = client.gets.chomp
+        p "request: #{request}"
+        result = RequestHandler.call(request, file_store)
+        client.puts(result)
+        client.close
+      end
     end
     # clean up
-    client.close
     server.close
   end
 end

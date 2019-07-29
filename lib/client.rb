@@ -2,6 +2,7 @@
 
 require "socket"
 require "readline"
+require "pry"
 
 def display_welcome
   puts "dkvs client initiated"
@@ -25,10 +26,10 @@ end
 SOCKET_NAME = "/tmp/dkvs.sock"
 
 display_welcome
-# opens socket to server
-client = UNIXSocket.new(SOCKET_NAME)
 # read input from user, send over socket, get response
 while true
+  # opens socket to server
+  client = UNIXSocket.new(SOCKET_NAME)
   display_line_segment
   request = Readline.readline("request: ", true).chomp
   break if request == "EXIT"
