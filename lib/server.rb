@@ -29,7 +29,7 @@ class Server
   def run
     # open listening socket
     server = UNIXServer.new(SOCKET_NAME)
-    while true
+    loop do
       # handle multiple client requests
       Thread.start(server.accept) do |client|
         request = client.gets.chomp
