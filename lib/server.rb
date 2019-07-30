@@ -28,12 +28,14 @@ class Server
       # handle multiple client requests
       Thread.start(socket.accept) do |client|
         loop do
-          request = client.gets.chomp
-          break if request.length.zero?
+          request = client.gets&.chomp
+          break if request.nil?
 
-          p "request: #{request}"
-          result = RequestHandler.call(request, file_store)
-          client.puts(result)
+          puts "request: #{request}"
+          response = RequestHandler.call(request, file_store)
+          puts "response: \"#{response}\""
+          client.puts(response)
+          puts "-----------------------"
         end
 
         client.close

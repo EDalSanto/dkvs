@@ -16,13 +16,11 @@ class Client
   def run
     loop do
       display_line_segment
-      request = Readline.readline("request: ", true).chomp
-      break if request == "EXIT"
-
+      request = Readline.readline('request: ', true).chomp
       socket.puts(request)
       # get response from server
       response = socket.recv(20).chomp
-      p "response: #{response}"
+      puts "response: \"#{response}\""
     end
   end
 
