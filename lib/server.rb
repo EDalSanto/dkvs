@@ -1,32 +1,23 @@
 # frozen_string_literal: true
 
 require "socket"
-require_relative "request_handler"
 require "pry"
+require_relative "request_handler"
+require_relative "file_store"
 
-# open listening socket, manage file store, delegate commands
+# handle client requests
 class Server
-  attr_accessor :file_store, :socket
-  STORE_FILE_NAME = "/tmp/store"
+  attr_accessor :file_store, :socket, :request_handler
   SOCKET_NAME = "/tmp/dkvs.sock"
 
   def initialize
-    # open file for appends / reads
-    self.file_store = File.open(STORE_FILE_NAME, "a+")
-    if file_store.size.zero?
-      # init file with serialized content
-      init_data = {}.to_json
-      file_store.write(init_data)
-      file_store.rewind
-    end
-    # open listening socket
+    self.file_store = FileStore.new
     self.socket = UNIXServer.new(SOCKET_NAME)
+    self.request_handler = RequestHandler.new(file_store)
   end
 
   def run
-    puts "Running Server..."
-    puts "Accepting Client Requests"
-    puts "------------------------"
+    boot_up
 
     loop do
       # handle multiple client requests
@@ -36,7 +27,7 @@ class Server
           break if request.nil?
 
           puts "request: #{request}"
-          response = RequestHandler.call(request, file_store)
+          response = request_handler.handle(request)
           puts "response: \"#{response}\""
           client.puts(response)
           puts "-----------------------"
@@ -51,6 +42,14 @@ class Server
 
   def shut_down
     File.unlink(SOCKET_NAME)
+  end
+
+  private
+
+  def boot_up
+    puts "Running Server..."
+    puts "Accepting Client Requests"
+    puts "------------------------"
   end
 end
 
