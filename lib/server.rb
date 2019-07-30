@@ -1,21 +1,16 @@
-#!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
 # frozen_string_literal: true
 
 require "socket"
 require_relative "request_handler"
 require "pry"
 
+# open listening socket, manage file store, delegate commands
 class Server
-  attr_accessor :file_store
+  attr_accessor :file_store, :socket
   STORE_FILE_NAME = "/tmp/store"
   SOCKET_NAME = "/tmp/dkvs.sock"
 
   def initialize
-    begin # ensure socket free
-      File.unlink(SOCKET_NAME)
-    rescue Errno::ENOENT
-      puts "socket not present, skipping unlink"
-    end
     # open file for appends / reads
     self.file_store = File.open(STORE_FILE_NAME, "a+")
     if file_store.size.zero?
@@ -24,24 +19,40 @@ class Server
       file_store.write(init_data)
       file_store.rewind
     end
+    # open listening socket
+    self.socket = UNIXServer.new(SOCKET_NAME)
   end
 
   def run
-    # open listening socket
-    server = UNIXServer.new(SOCKET_NAME)
     loop do
       # handle multiple client requests
-      Thread.start(server.accept) do |client|
-        request = client.gets.chomp
-        p "request: #{request}"
-        result = RequestHandler.call(request, file_store)
-        client.puts(result)
+      Thread.start(socket.accept) do |client|
+        loop do
+          request = client.gets.chomp
+          break if request.length.zero?
+
+          p "request: #{request}"
+          result = RequestHandler.call(request, file_store)
+          client.puts(result)
+        end
+
         client.close
       end
     end
-    # clean up
-    server.close
+
+    shut_down
+  end
+
+  def shut_down
+    File.unlink(SOCKET_NAME)
   end
 end
 
-Server.new.run
+# TODO: move to executable
+server = Server.new
+# Trap ^C
+Signal.trap("INT") {
+  server.shut_down
+  exit
+}
+server.run
