@@ -4,6 +4,7 @@ require "socket"
 require "readline"
 require "pry"
 
+# make connection to server process, sends request and receives response
 class Client
   attr_accessor :socket
   SOCKET_NAME = "/tmp/dkvs.sock"
@@ -14,6 +15,8 @@ class Client
 
   # read input from user, send over socket, get response
   def run
+    puts "Running Client..."
+
     loop do
       display_line_segment
       request = Readline.readline('request: ', true).chomp
@@ -53,6 +56,9 @@ end
 client = Client.new
 Signal.trap("INT") {
   client.shutdown
+  puts ""
+  puts "-----------------------"
+  puts "Shutting down client"
   exit
 }
 client.run

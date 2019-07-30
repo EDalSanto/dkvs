@@ -24,6 +24,10 @@ class Server
   end
 
   def run
+    puts "Running Server..."
+    puts "Accepting Client Requests"
+    puts "------------------------"
+
     loop do
       # handle multiple client requests
       Thread.start(socket.accept) do |client|
@@ -55,6 +59,9 @@ server = Server.new
 # Trap ^C
 Signal.trap("INT") {
   server.shut_down
+  puts ""
+  puts "-------------------"
+  puts "Shutting down server"
   exit
 }
 server.run
