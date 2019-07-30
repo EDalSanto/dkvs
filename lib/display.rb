@@ -2,9 +2,15 @@
 
 # helper methods for command line "UI"
 class Display
-  def welcome
+  def client_welcome
     puts "dkvs client initiated"
     usage
+  end
+
+  def server_boot_up
+    puts "Running Server..."
+    puts "Accepting Client Requests"
+    puts "------------------------"
   end
 
   def invalid_input
@@ -23,5 +29,13 @@ class Display
 
   def key_value(key, value)
     puts "#{key}: \"#{value}\""
+  end
+
+  def new_line
+    ""
+  end
+
+  def shutdown
+    "Shutting down..."
   end
 end

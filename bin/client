@@ -4,22 +4,21 @@
 require_relative "../lib/client"
 require_relative "../lib/display"
 
-puts "Connecting Client to Server..."
 client = Client.new
-
+display = Display.new
+display.client_welcome
 # ^Ctrl-C
 Signal.trap("INT") {
+  display.new_line
+  display.line_segment
+  display.shutdown
   client.shutdown
-  puts ""
-  puts "-----------------------"
-  puts "Shutting down client"
   exit
 }
 
-display = Display.new
-loop {
+loop do
   display.line_segment
   request = Readline.readline('request: ', true).chomp
   response = client.send(request)
   display.key_value("response", response)
-}
+end

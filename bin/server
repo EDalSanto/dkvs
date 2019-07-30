@@ -2,14 +2,31 @@
 # frozen_string_literal: true
 
 require_relative "../lib/server"
+require_relative "../lib/display"
 
 server = Server.new
+display = Display.new
 # Trap ^C
 Signal.trap("INT") {
+  display.new_line
+  display.line_segment
+  display.shutdown
   server.shut_down
-  puts ""
-  puts "-------------------"
-  puts "Shutting down server"
   exit
 }
-server.run
+
+display.server_boot_up
+server.accept_connections do |client|
+  loop do
+    request = client.gets
+    break if request.nil?
+
+    request.chomp!
+    display.key_value("request", request)
+    response = server.handle(request)
+    display.key_value("response", response)
+    client.puts(response)
+
+    display.line_segment
+  end
+end

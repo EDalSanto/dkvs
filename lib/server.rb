@@ -16,39 +16,21 @@ class Server
     self.request_handler = RequestHandler.new(file_store)
   end
 
-  def run
-    boot_up
-
+  def accept_connections
     loop do
       # handle multiple client requests
       Thread.start(socket.accept) do |client|
-        loop do
-          request = client.gets&.chomp
-          break if request.nil?
-
-          puts "request: #{request}"
-          response = request_handler.handle(request)
-          puts "response: \"#{response}\""
-          client.puts(response)
-          puts "-----------------------"
-        end
-
+        yield(client)
         client.close
       end
     end
+  end
 
-    shut_down
+  def handle(request)
+    request_handler.handle(request)
   end
 
   def shut_down
     File.unlink(SOCKET_NAME)
-  end
-
-  private
-
-  def boot_up
-    puts "Running Server..."
-    puts "Accepting Client Requests"
-    puts "------------------------"
   end
 end
