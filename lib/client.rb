@@ -52,13 +52,3 @@ class Client
     puts "------------------------"
   end
 end
-
-client = Client.new
-Signal.trap("INT") {
-  client.shutdown
-  puts ""
-  puts "-----------------------"
-  puts "Shutting down client"
-  exit
-}
-client.run

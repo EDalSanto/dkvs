@@ -1,4 +1,5 @@
 #!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
+# frozen_string_literal: true
 
 require_relative "../lib/server"
 
