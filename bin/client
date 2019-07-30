@@ -2,8 +2,12 @@
 # frozen_string_literal: true
 
 require_relative "../lib/client"
+require_relative "../lib/display"
 
+puts "Connecting Client to Server..."
 client = Client.new
+
+# ^Ctrl-C
 Signal.trap("INT") {
   client.shutdown
   puts ""
@@ -11,4 +15,11 @@ Signal.trap("INT") {
   puts "Shutting down client"
   exit
 }
-client.run
+
+display = Display.new
+loop {
+  display.line_segment
+  request = Readline.readline('request: ', true).chomp
+  response = client.send(request)
+  display.key_value("response", response)
+}
