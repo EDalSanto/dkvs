@@ -2,11 +2,12 @@
 
 # handles details of maintaining persistent data
 class FileStore
-  attr_accessor :file
-  PATH = "/tmp/dkvs_store"
+  attr_accessor :file, :path
+  DEFAULT_PATH = "/tmp/dkvs_store"
 
-  def initialize
-    self.file = File.open(PATH, "a+")
+  def initialize(path: DEFUALT_PATH)
+    self.path = path
+    self.file = File.open(path, "a+")
     init_file if file.size.zero?
   end
 
@@ -19,6 +20,10 @@ class FileStore
   def write(data)
     File.write(file, data.to_json)
     file.rewind
+  end
+
+  def delete
+    File.delete(path)
   end
 
   private

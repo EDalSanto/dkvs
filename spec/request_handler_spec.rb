@@ -2,28 +2,37 @@
 
 require "rspec"
 require_relative "../lib/request_handler"
+require_relative "../lib/file_store"
+
+TEST_PATH = "/tmp/test_store"
 
 describe RequestHandler do
-  describe ".call" do
-    context "GET" do
-      it "returns nil when key not present in file" do
-        request = "GET foo"
-        file_store = File.new("test_file", "w+")
+  describe "#handle" do
+    after(:each) { file_store.delete }
+    # need test file
+    let(:file_store) { FileStore.new(path: TEST_PATH) }
+    let(:handler) { described_class.new(file_store) }
 
-        response = described_class.call(request, file_store)
+    context "GET" do
+      it "returns nil when key not present in file store" do
+        request = "GET foo"
+        response = handler.handle(request)
         expect(response).to be_nil
-        # clean up TODO: stub
-        File.delete(file_store)
       end
 
-      it "returns value when key present in file" do
-
+      it "returns value when key present in file store" do
+        request = "GET foo"
+        file_store.write(foo: 42)
+        response = handler.handle(request)
+        expect(response).to eq(42)
       end
     end
 
     context "SET" do
-      it "updates the key in the file" do
-
+      it "updates the key in the file store" do
+        request = "SET foo=42"
+        response = handler.handle(request)
+        expect(response).to eq("42")
       end
     end
   end
