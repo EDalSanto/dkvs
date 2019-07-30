@@ -1,3 +1,14 @@
+#!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
+
+require_relative "../lib/server"
 
 server = Server.new
+# Trap ^C
+Signal.trap("INT") {
+  server.shut_down
+  puts ""
+  puts "-------------------"
+  puts "Shutting down server"
+  exit
+}
 server.run

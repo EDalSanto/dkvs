@@ -52,15 +52,3 @@ class Server
     puts "------------------------"
   end
 end
-
-# TODO: move to executable
-server = Server.new
-# Trap ^C
-Signal.trap("INT") {
-  server.shut_down
-  puts ""
-  puts "-------------------"
-  puts "Shutting down server"
-  exit
-}
-server.run

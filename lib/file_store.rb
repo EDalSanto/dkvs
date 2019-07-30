@@ -5,7 +5,7 @@ class FileStore
   attr_accessor :file, :path
   DEFAULT_PATH = "/tmp/dkvs_store"
 
-  def initialize(path: DEFUALT_PATH)
+  def initialize(path: DEFAULT_PATH)
     self.path = path
     self.file = File.open(path, "a+")
     init_file if file.size.zero?
