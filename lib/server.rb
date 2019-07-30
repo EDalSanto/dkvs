@@ -15,7 +15,7 @@ class Server
     self.file_store = File.open(STORE_FILE_NAME, "a+")
     if file_store.size.zero?
       # init file with serialized content
-      init_data = Marshal.dump({})
+      init_data = {}.to_json
       file_store.write(init_data)
       file_store.rewind
     end

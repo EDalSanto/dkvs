@@ -6,9 +6,9 @@ require "pry"
 class RequestHandler
   def self.call(request, file_store)
     # load data into memory
-    serialized_file_contents = file_store.read
+    json_file_contents = file_store.read
     file_store.rewind
-    memory_store = Marshal.load(serialized_file_contents)
+    memory_store = JSON.parse(json_file_contents)
     # process command
     command, args = request.split
     case command
@@ -27,7 +27,7 @@ class RequestHandler
         puts "Could not save #{request.inspect}"
       end
       # flush that overwrites file with memory store
-      File.write(file_store, Marshal.dump(memory_store))
+      File.write(file_store, memory_store.to_json)
       file_store.rewind
       memory_store[key]
     end
