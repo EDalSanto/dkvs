@@ -17,6 +17,7 @@ Signal.trap("INT") {
 
 display.server_boot_up
 server.accept_connections do |client|
+  # persistent connection
   loop do
     request = client.gets
     break if request.nil?
