@@ -31,8 +31,17 @@ describe RequestHandler do
     context "SET" do
       it "updates the key in the file store" do
         request = "SET foo=42"
-        response = handler.handle(request)
-        expect(response).to eq("42")
+        handler.handle(request)
+        memory_store = file_store.read
+        expect(memory_store["foo"]).to eq("42")
+      end
+
+      it "sets multiples key/values" do
+        request = "SET foo=42&bar=10"
+        handler.handle(request)
+        memory_store = file_store.read
+        expect(memory_store["foo"]).to eq("42")
+        expect(memory_store["bar"]).to eq("10")
       end
     end
   end
