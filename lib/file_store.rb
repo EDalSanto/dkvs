@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "hash_map_pb"
+
 # handles details of maintaining persistent data
 class FileStore
   attr_accessor :file, :path
@@ -12,13 +14,13 @@ class FileStore
   end
 
   def read
-    output = JSON.parse(file.read)
+    output = decode(file.read)
     file.rewind
-    output
+    output["pairs"]
   end
 
   def write(data)
-    File.write(file, data.to_json)
+    File.write(file, encode(pb_data(pairs: data)))
     file.rewind
   end
 
@@ -29,8 +31,23 @@ class FileStore
   private
 
   def init_file
-    init_data = {}.to_json
-    file.write(init_data)
+    file.write(encode(init_data))
     file.rewind
+  end
+
+  def init_data
+    pb_data(pairs: {})
+  end
+
+  def pb_data(pairs:)
+    Dkvs::HashMap.new(pairs: pairs)
+  end
+
+  def encode(pb_data)
+    Dkvs::HashMap.encode(pb_data)
+  end
+
+  def decode(encoded_data)
+    Dkvs::HashMap.decode(encoded_data)
   end
 end

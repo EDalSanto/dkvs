@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package dkvs;
+message HashMap {
+  map<string, string> pairs = 1;
+}

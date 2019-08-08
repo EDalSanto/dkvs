@@ -9,4 +9,5 @@ Gem::Specification.new do |s|
   s.add_dependency("rspec")
   s.add_dependency("pry")
   s.add_dependency("protobuf")
+  s.add_dependency("google-protobuf")
 end
