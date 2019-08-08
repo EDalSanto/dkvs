@@ -11,14 +11,14 @@ display.client_welcome
 Signal.trap("INT") {
   display.new_line
   display.line_segment
-  display.shutdown
-  client.shutdown
+  display.shut_down
+  client.shut_down
   exit
 }
 
 loop do
   display.line_segment
-  request = Readline.readline('request: ', true).chomp
+  request = Readline.readline('dkvs: ', true).chomp
   response = client.send(request)
   display.key_value("response", response)
 end

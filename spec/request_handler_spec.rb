@@ -36,6 +36,20 @@ describe RequestHandler do
         expect(memory_store["foo"]).to eq("42")
       end
 
+      it "allows spaces" do
+        request = "SET foo = 42"
+        handler.handle(request)
+        memory_store = file_store.read
+        expect(memory_store["foo"]).to eq("42")
+      end
+
+      it "allows lowercase" do
+        request = "set foo=42"
+        handler.handle(request)
+        memory_store = file_store.read
+        expect(memory_store["foo"]).to eq("42")
+      end
+
       it "sets multiples key/values" do
         request = "SET foo=42&bar=10"
         handler.handle(request)

@@ -10,7 +10,7 @@ display = Display.new
 Signal.trap("INT") {
   display.new_line
   display.line_segment
-  display.shutdown
+  display.shut_down
   server.shut_down
   exit
 }

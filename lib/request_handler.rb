@@ -4,8 +4,9 @@ require "pry"
 
 # Handle requests made to server from clients
 class RequestHandler
-  KEY_VALUE_PAIRS_DELIMETER = "&"
-  KEY_VALUE_DELIMETER = "="
+  COMMAND_ARGS_DELIMETER = /\s+/
+  KEY_VALUE_PAIRS_DELIMETER = /\s*&\s*/
+  KEY_VALUE_DELIMETER = /\s*=\s*/
   attr_reader :file_store
 
   def initialize(file_store)
@@ -14,8 +15,9 @@ class RequestHandler
 
   def handle(request)
     memory_store = file_store.read
-    command, args = request.split
-    case command
+    # String#split takes 2nd argument which limit
+    command, args = request.split(COMMAND_ARGS_DELIMETER, 2)
+    case command.upcase
     when "GET"
       key = args
       memory_store[key]

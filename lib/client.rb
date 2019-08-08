@@ -18,7 +18,7 @@ class Client
     socket.gets.chomp
   end
 
-  def shutdown
+  def shut_down
     socket.close
   end
 end

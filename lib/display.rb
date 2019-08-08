@@ -35,7 +35,7 @@ class Display
     ""
   end
 
-  def shutdown
+  def shut_down
     "Shutting down..."
   end
 end
