@@ -4,9 +4,11 @@ require "rspec"
 require_relative "../lib/server"
 require_relative "../lib/client"
 
+TEST_SOCKET_NAME = "/tmp/test_dkvs.sock"
+
 describe "Client/Server Interaction" do
   it "can exchange messages" do
-    server = Server.new
+    server = Server.new(socket_name: TEST_SOCKET_NAME)
     # listen to connections in different thread
     thread = Thread.new do
       server.accept_connections do |client|
@@ -16,11 +18,11 @@ describe "Client/Server Interaction" do
       end
     end
     # connect with client
-    client_one = Client.new
+    client_one = Client.new(socket_name: TEST_SOCKET_NAME)
     response = client_one.send("msg from client one")
     expect(response).to_not be_nil
     # connect with another client
-    client_two = Client.new
+    client_two = Client.new(socket_name: TEST_SOCKET_NAME)
     response = client_two.send("msg from client two")
     expect(response).to_not be_nil
     # kill thread waiting for connections

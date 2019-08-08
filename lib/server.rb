@@ -8,11 +8,11 @@ require_relative "file_store"
 # handle client requests
 class Server
   attr_accessor :file_store, :socket, :request_handler
-  SOCKET_NAME = "/tmp/dkvs.sock"
+  DEFAULT_SOCKET_NAME = "/tmp/dkvs.sock"
 
-  def initialize
+  def initialize(socket_name: DEFAULT_SOCKET_NAME)
     self.file_store = FileStore.new
-    self.socket = UNIXServer.new(SOCKET_NAME)
+    self.socket = UNIXServer.new(socket_name)
     self.request_handler = RequestHandler.new(file_store)
   end
 
@@ -31,6 +31,6 @@ class Server
   end
 
   def shut_down
-    File.unlink(SOCKET_NAME)
+    File.unlink(socket.path)
   end
 end
