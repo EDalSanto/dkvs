@@ -10,14 +10,14 @@ describe FileStore do
 
   describe "#read" do
     it "returns parsed JSON" do
-      data = { "a" => 42 }
+      data = { "a" => "42" }
       File.write(STORE_TEST_PATH, data.to_json)
       file_store = described_class.new(path: STORE_TEST_PATH)
       expect(file_store.read).to eq(data)
     end
 
     it "returns parsed JSON even on multiple calls" do
-      data = { "a" => 42 }
+      data = { "a" => "42" }
       File.write(STORE_TEST_PATH, data.to_json)
       file_store = described_class.new(path: STORE_TEST_PATH)
       expect(file_store.read).to eq(data)

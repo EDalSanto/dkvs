@@ -21,9 +21,9 @@ describe RequestHandler do
 
       it "returns value when key present in file store" do
         request = "GET foo"
-        file_store.write(foo: 42)
+        file_store.write({ "foo" => "42"})
         response = handler.handle(request)
-        expect(response).to eq(42)
+        expect(response).to eq("42")
       end
     end
 
