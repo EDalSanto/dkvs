@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "hash_map_pb"
+require_relative "./hash_map_pb"
 
 # handles details of maintaining persistent data
 class FileStore
@@ -16,7 +16,7 @@ class FileStore
   def read
     output = decode(file.read)
     file.rewind
-    output["pairs"]
+    output["pairs"].to_h
   end
 
   def write(data)
@@ -35,6 +35,7 @@ class FileStore
     file.rewind
   end
 
+  # TODO: extract details about Dkvs
   def init_data
     pb_data(pairs: {})
   end
