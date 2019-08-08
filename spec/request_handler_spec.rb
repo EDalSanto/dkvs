@@ -3,14 +3,13 @@
 require "rspec"
 require_relative "../lib/request_handler"
 require_relative "../lib/file_store"
-
-TEST_PATH = "/tmp/test_store"
+require "spec_helper"
 
 describe RequestHandler do
   describe "#handle" do
     after(:each) { file_store.delete }
     # need test file
-    let(:file_store) { FileStore.new(path: TEST_PATH) }
+    let(:file_store) { FileStore.new(path: STORE_TEST_PATH) }
     let(:handler) { described_class.new(file_store) }
 
     context "GET" do
