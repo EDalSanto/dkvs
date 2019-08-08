@@ -1,0 +1,33 @@
+#!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
+# frozen_string_literal: true
+
+require_relative "../lib/server"
+require_relative "../lib/display"
+
+server = Server.new
+display = Display.new
+# Trap ^C
+Signal.trap("INT") {
+  display.new_line
+  display.line_segment
+  display.shut_down
+  server.shut_down
+  exit
+}
+
+display.server_boot_up
+server.accept_connections do |client|
+  # persistent connection
+  loop do
+    request = client.gets
+    break if request.nil?
+
+    request.chomp!
+    display.key_value("request", request)
+    response = server.handle(request)
+    display.key_value("response", response)
+    client.puts(response)
+
+    display.line_segment
+  end
+end

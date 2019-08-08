@@ -1,0 +1,24 @@
+#!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
+# frozen_string_literal: true
+
+require_relative "../lib/client"
+require_relative "../lib/display"
+
+client = Client.new
+display = Display.new
+display.client_welcome
+# ^Ctrl-C
+Signal.trap("INT") {
+  display.new_line
+  display.line_segment
+  display.shut_down
+  client.shut_down
+  exit
+}
+
+loop do
+  display.line_segment
+  request = Readline.readline('dkvs: ', true).chomp
+  response = client.send(request)
+  display.key_value("response", response)
+end
