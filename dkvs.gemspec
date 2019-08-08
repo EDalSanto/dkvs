@@ -8,4 +8,5 @@ Gem::Specification.new do |s|
   s.email       = "ejds001@gmail.com"
   s.add_dependency("rspec")
   s.add_dependency("pry")
+  s.add_dependency("protobuf")
 end
