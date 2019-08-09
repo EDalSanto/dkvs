@@ -4,9 +4,9 @@ require "pry"
 
 # Handle requests made to server from clients
 class RequestHandler
-  COMMAND_ARGS_DELIMETER = /\s+/
-  KEY_VALUE_PAIRS_DELIMETER = /\s*&\s*/
-  KEY_VALUE_DELIMETER = /\s*=\s*/
+  COMMAND_ARGS_DELIMETER = /\s+/.freeze
+  KEY_VALUE_PAIRS_DELIMETER = /\s*&\s*/.freeze
+  KEY_VALUE_DELIMETER = /\s*=\s*/.freeze
   attr_reader :file_store
 
   def initialize(file_store)
