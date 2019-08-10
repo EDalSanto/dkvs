@@ -4,7 +4,8 @@
 require_relative "../lib/server"
 require_relative "../lib/display"
 
-server = Server.new
+socket_name = $stdin.gets.chomp
+server = Server.new(socket_name: socket_name)
 display = Display.new
 # Trap ^C
 Signal.trap("INT") {
@@ -19,10 +20,7 @@ display.server_boot_up
 server.accept_connections do |client|
   # persistent connection
   loop do
-    request = client.gets
-    break if request.nil?
-
-    request.chomp!
+    request = client.gets.chomp
     display.key_value("request", request)
     response = server.handle(request)
     display.key_value("response", response)

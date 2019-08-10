@@ -1,0 +1,38 @@
+#!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
+# frozen_string_literal: true
+
+require_relative "../lib/load_balancer"
+require_relative "../lib/display"
+
+load_balancer = LoadBalancer.new
+display = Display.new
+# Trap ^C
+Signal.trap("INT") {
+  display.new_line
+  display.line_segment
+  display.shut_down
+  exit
+}
+
+begin
+  display = Display.new
+  load_balancer.connect_to_primary
+  load_balancer.connect_to_replica
+  load_balancer.accept_connections do |client|
+    # persistent connection
+    loop do
+      request = client.gets
+      break if request.nil?
+
+      request.chomp!
+      display.key_value("request", request)
+      response = load_balancer.distribute(request)
+      display.key_value("response", response)
+      client.puts(response)
+
+      display.line_segment
+    end
+  end
+ensure
+  load_balancer.shut_down
+end

@@ -4,12 +4,12 @@ require "socket"
 require "readline"
 require "pry"
 
-# make connection to server process, sends request and receives response
+# make connection to load balancer process, sends request and receives response
 class Client
   attr_accessor :socket
-  DEFAULT_SOCKET_NAME = "/tmp/dkvs.sock"
+  LB_SOCKET_PATH = "/tmp/dkvs_lb.sock"
 
-  def initialize(socket_name: DEFAULT_SOCKET_NAME)
+  def initialize(socket_name: LB_SOCKET_PATH)
     self.socket = UNIXSocket.new(socket_name)
   end
 
