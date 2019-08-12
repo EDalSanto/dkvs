@@ -4,8 +4,9 @@
 require_relative "../lib/server"
 require_relative "../lib/display"
 
-socket_name = $stdin.gets.chomp
-server = Server.new(socket_name: socket_name)
+puts "primary? true or false"
+primary = $stdin.gets.chomp
+server = Server.new(primary: primary)
 display = Display.new
 # Trap ^C
 Signal.trap("INT") {
@@ -16,16 +17,22 @@ Signal.trap("INT") {
   exit
 }
 
-display.server_boot_up
-server.accept_connections do |client|
-  # persistent connection
-  loop do
-    request = client.gets.chomp
-    display.key_value("request", request)
-    response = server.handle(request)
-    display.key_value("response", response)
-    client.puts(response)
+begin
+  display.server_boot_up
+  server.accept_connections do |client|
+    # persistent connection
+    loop do
+      request = client.gets.chomp
+      display.key_value("request #{Time.now.to_i}", request)
+      response = server.handle(request)
+      display.key_value("response", response)
+      client.puts(response)
 
-    display.line_segment
+      display.line_segment
+
+      server.replicate_async(request) if server.primary?
+    end
   end
+ensure
+  server.shut_down
 end

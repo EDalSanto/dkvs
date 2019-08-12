@@ -1,15 +1,21 @@
 # frozen_string_literal: true
 
 require_relative "./hash_map_pb"
+require "pry"
 
 # handles details of maintaining persistent data
 class FileStore
   attr_accessor :file, :path
-  DEFAULT_PATH = "/tmp/dkvs_store"
+  PRIMARY_PATH = "/tmp/dkvs_store"
+  REPLICA_PATH = "/tmp/dkvs_replica_store"
 
-  def initialize(path: DEFAULT_PATH)
-    self.path = path
-    self.file = File.open(path, "a+")
+  def initialize(primary, path: PRIMARY_PATH)
+    self.path = primary ? PRIMARY_PATH : REPLICA_PATH
+    # get replica up to date to last disk
+    if !primary
+      File.write(self.path, File.read(PRIMARY_PATH))
+    end
+    self.file = File.open(self.path, "a+")
     init_file if file.size.zero?
   end
 

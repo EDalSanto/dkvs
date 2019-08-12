@@ -17,12 +17,12 @@ class LoadBalancer
   def connect_to_primary
     # primary = Server.new(primary: true)
     # open socket to expected running process
-    primary = UNIXSocket.new("/tmp/dkvs-primary.sock")
+    primary = UNIXSocket.new("/tmp/dkvs-primary-server.sock")
     servers.push(primary)
   end
 
   def connect_to_replica
-    replica = UNIXSocket.new("/tmp/dkvs-replica.sock")
+    replica = UNIXSocket.new("/tmp/dkvs-replica-server.sock")
     servers.push(replica)
   end
 

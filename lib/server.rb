@@ -9,12 +9,17 @@ require_relative "file_store"
 class Server
   BASE_SOCKET_PATH = "/tmp/dkvs"
   SOCKET_EXT = "sock"
-  attr_accessor :file_store, :socket, :request_handler
+  PRIMARY_SOCKET_PATH = "/tmp/dkvs-primary-server.sock"
+  REPLICA_SOCKET_PATH = "/tmp/dkvs-replica-server.sock"
+  attr_accessor :file_store, :socket, :request_handler, :primary, :socket_path, :wal
 
-  def initialize(socket_name:)
-    self.file_store = FileStore.new
-    self.socket = UNIXServer.new(full_socket_path(socket_name))
-    self.request_handler = RequestHandler.new(file_store)
+  def initialize(primary:)
+    self.primary = primary == "true" ? true : false
+    self.file_store = FileStore.new(self.primary)
+    self.wal = "wal"
+    self.socket_path = self.primary ? PRIMARY_SOCKET_PATH : REPLICA_SOCKET_PATH
+    self.socket = UNIXServer.new(socket_path)
+    self.request_handler = RequestHandler.new(file_store, wal)
   end
 
   def accept_connections
@@ -28,6 +33,10 @@ class Server
     end
   end
 
+  def replicate_async(request)
+    UNIXSocket.new(REPLICA_SOCKET_PATH).puts(request)
+  end
+
   def handle(request)
     request_handler.handle(request)
   end
@@ -36,9 +45,7 @@ class Server
     File.unlink(socket.path)
   end
 
-  private
-
-  def full_socket_path(socket_name)
-    "#{BASE_SOCKET_PATH}-#{socket_name}.#{SOCKET_EXT}"
+  def primary?
+    primary == true
   end
 end
