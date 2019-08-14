@@ -19,7 +19,7 @@ class Server
     self.wal = "wal"
     self.socket_path = self.primary ? PRIMARY_SOCKET_PATH : REPLICA_SOCKET_PATH
     self.socket = UNIXServer.new(socket_path)
-    self.request_handler = RequestHandler.new(file_store, wal)
+    self.request_handler = RequestHandler.new(self, wal)
   end
 
   def accept_connections
@@ -33,7 +33,8 @@ class Server
     end
   end
 
-  def replicate_async(request)
+  # should probably be on WAL or WAL process
+  def replicate(request)
     UNIXSocket.new(REPLICA_SOCKET_PATH).puts(request)
   end
 

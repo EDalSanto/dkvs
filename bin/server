@@ -29,8 +29,6 @@ begin
       client.puts(response)
 
       display.line_segment
-
-      server.replicate_async(request) if server.primary?
     end
   end
 ensure
