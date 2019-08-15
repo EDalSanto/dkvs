@@ -7,11 +7,13 @@ require_relative "server"
 # distributes requests to a server using round robin
 class LoadBalancer
   LISTENING_SOCKET_PATH = "/tmp/dkvs_lb.sock"
+  PRIMARY_SERVER_SOCKET_PATH = "/tmp/dkvs-primary-server.sock"
+  REPLICA_SERVER_SOCKET_PATH = "/tmp/dkvs-replica-server.sock"
   attr_accessor :servers, :primary, :replica, :listening_socket
 
   def initialize(servers: [])
-    self.primary = UNIXSocket.new("/tmp/dkvs-primary-server.sock")
-    self.replica = UNIXSocket.new("/tmp/dkvs-replica-server.sock")
+    self.primary = UNIXSocket.new(PRIMARY_SERVER_SOCKET_PATH)
+    self.replica = UNIXSocket.new(REPLICA_SERVER_SOCKET_PATH)
     self.servers = [ primary, replica ]
     self.listening_socket = UNIXServer.new(LISTENING_SOCKET_PATH)
   end
@@ -30,10 +32,10 @@ class LoadBalancer
 
   # send server request and get back response
   def distribute(request)
-    promote_primary if !primary_available?
+    promote_replica_to_primary if primary_not_available?
+    return "Uh Oh, no primary" if primary.nil?
 
     if write?(request)
-      return "Uh Oh, no primary" if primary.nil?
       send(primary, request)
     else
       send(random_server, request)
@@ -46,18 +48,20 @@ class LoadBalancer
 
   private
 
-  def promote_primary
-    self.primary = replica
+  def promote_replica_to_primary
+    # remove primary
+    servers.shift
+    self.primary = servers.first
   end
 
-  def primary_available?
+  def primary_not_available?
     begin
       primary.puts "PING"
       primary.gets # nada
     rescue Errno::EPIPE
-      false
-    else
       true
+    else
+      false
     end
   end
 
