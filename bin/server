@@ -1,12 +1,13 @@
 #!/Users/Me/.rbenv/versions/2.5.3/bin/ruby
 # frozen_string_literal: true
 
-require_relative "../lib/server"
+require_relative "../lib/primary_server"
+require_relative "../lib/replica_server"
 require_relative "../lib/display"
 
 puts "primary? true or false"
-primary = $stdin.gets.chomp
-server = Server.new(primary: primary)
+primary = $stdin.gets.chomp == "true"
+server = primary ? PrimaryServer.new : ReplicaServer.new
 display = Display.new
 # Trap ^C
 Signal.trap("INT") {

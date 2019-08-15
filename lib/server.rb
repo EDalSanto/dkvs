@@ -6,14 +6,11 @@ require_relative "file_store"
 
 # handle client requests
 class Server
-  PRIMARY_SOCKET_PATH = "/tmp/dkvs-primary-server.sock"
   REPLICA_SOCKET_PATH = "/tmp/dkvs-replica-server.sock"
-  attr_accessor :up, :file_store, :socket, :request_handler, :primary, :socket_path
+  attr_accessor :up, :file_store, :socket, :request_handler
 
-  def initialize(primary:)
-    self.primary = primary == "true"
-    self.file_store = FileStore.new(self.primary)
-    self.socket_path = self.primary ? PRIMARY_SOCKET_PATH : REPLICA_SOCKET_PATH
+  def initialize
+    self.file_store = FileStore.new(path: file_path)
     self.socket = UNIXServer.new(socket_path)
     self.request_handler = RequestHandler.new(self)
     self.up = true
@@ -47,5 +44,15 @@ class Server
     self.up = false
 
     true
+  end
+
+  private
+
+  def file_path
+    raise "Implemented in SubClass"
+  end
+
+  def socket_path
+    raise "Implemented in SubClass"
   end
 end

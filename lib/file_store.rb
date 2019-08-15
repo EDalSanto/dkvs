@@ -4,15 +4,14 @@ require_relative "./hash_map_pb"
 
 # handles details of maintaining persistent data
 class FileStore
+  PRIMARY_PATH = "/tmp/dkvs-store"
   attr_accessor :file, :path
-  PRIMARY_PATH = "/tmp/dkvs_store"
-  REPLICA_PATH = "/tmp/dkvs_replica_store"
 
-  def initialize(primary, path: PRIMARY_PATH)
-    self.path = primary ? PRIMARY_PATH : REPLICA_PATH
-    update_to_latest_primary
+  def initialize(path:)
+    self.path = path
     self.file = File.open(self.path, "a+")
     init_file if file.size.zero?
+    update_to_latest_primary
   end
 
   def read
