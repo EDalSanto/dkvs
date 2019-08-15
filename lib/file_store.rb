@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "./hash_map_pb"
-require "pry"
 
 # handles details of maintaining persistent data
 class FileStore
@@ -11,10 +10,7 @@ class FileStore
 
   def initialize(primary, path: PRIMARY_PATH)
     self.path = primary ? PRIMARY_PATH : REPLICA_PATH
-    # get replica up to date to last disk
-    if !primary
-      File.write(self.path, File.read(PRIMARY_PATH))
-    end
+    update_to_latest_primary
     self.file = File.open(self.path, "a+")
     init_file if file.size.zero?
   end
@@ -35,6 +31,10 @@ class FileStore
   end
 
   private
+
+  def update_to_latest_primary
+    File.write(path, File.read(PRIMARY_PATH))
+  end
 
   def init_file
     file.write(encode(init_data))

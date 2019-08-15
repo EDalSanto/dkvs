@@ -1,25 +1,21 @@
 # frozen_string_literal: true
 
 require "socket"
-require "pry"
 require_relative "request_handler"
 require_relative "file_store"
 
 # handle client requests
 class Server
-  BASE_SOCKET_PATH = "/tmp/dkvs"
-  SOCKET_EXT = "sock"
   PRIMARY_SOCKET_PATH = "/tmp/dkvs-primary-server.sock"
   REPLICA_SOCKET_PATH = "/tmp/dkvs-replica-server.sock"
-  attr_accessor :up, :file_store, :socket, :request_handler, :primary, :socket_path, :wal
+  attr_accessor :up, :file_store, :socket, :request_handler, :primary, :socket_path
 
   def initialize(primary:)
-    self.primary = primary == "true" ? true : false
+    self.primary = primary == "true"
     self.file_store = FileStore.new(self.primary)
-    self.wal = "wal"
     self.socket_path = self.primary ? PRIMARY_SOCKET_PATH : REPLICA_SOCKET_PATH
     self.socket = UNIXServer.new(socket_path)
-    self.request_handler = RequestHandler.new(self, wal)
+    self.request_handler = RequestHandler.new(self)
     self.up = true
   end
 
@@ -51,9 +47,5 @@ class Server
     self.up = false
 
     true
-  end
-
-  def primary?
-    primary == true
   end
 end
