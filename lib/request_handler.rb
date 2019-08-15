@@ -7,14 +7,14 @@ class RequestHandler
   COMMAND_ARGS_DELIMETER = /\s+/.freeze
   KEY_VALUE_PAIRS_DELIMETER = /\s*&\s*/.freeze
   KEY_VALUE_DELIMETER = /\s*=\s*/.freeze
-  attr_reader :file_store
+  attr_reader :server
 
-  def initialize(file_store)
-    @file_store = file_store
+  def initialize(server)
+    @server = server
   end
 
   def handle(request)
-    memory_store = file_store.read
+    memory_store = server.file_store.read
     # String#split takes 2nd argument which limit
     command, args = request.split(COMMAND_ARGS_DELIMETER, 2)
     case command.upcase
@@ -29,9 +29,13 @@ class RequestHandler
       end
       # flush that overwrites file with memory store
       # maybe can flush only when server closes or periodically to reduce I/Os
-      file_store.write(memory_store)
-      memory_store[key]
-      true
+      result = server.file_store.write(memory_store)
+      if result
+        server.replicate(request) if server.primary
+        true
+      else
+        false
+      end
     end
   end
 end

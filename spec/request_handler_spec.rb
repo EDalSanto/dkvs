@@ -7,10 +7,10 @@ require "spec_helper"
 
 describe RequestHandler do
   describe "#handle" do
-    after(:each) { file_store.delete }
-    # need test file
-    let(:file_store) { FileStore.new(path: STORE_TEST_PATH) }
-    let(:handler) { described_class.new(file_store) }
+    after(:each) { file_store.delete ; server.shut_down }
+    let(:server) { TestServer.new }
+    let(:file_store) { server.file_store }
+    let(:handler) { described_class.new(server) }
 
     context "GET" do
       it "returns nil when key not present in file store" do
