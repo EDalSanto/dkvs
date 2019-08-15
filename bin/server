@@ -32,5 +32,5 @@ begin
     end
   end
 ensure
-  server.shut_down if server.up
+  server.shut_down
 end

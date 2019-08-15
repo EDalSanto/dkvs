@@ -44,9 +44,13 @@ class Server
   end
 
   def shut_down
+    return true if !up
+
     File.unlink(socket.path)
     socket.close
     self.up = false
+
+    true
   end
 
   def primary?
