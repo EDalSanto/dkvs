@@ -11,7 +11,7 @@ class Server
   SOCKET_EXT = "sock"
   PRIMARY_SOCKET_PATH = "/tmp/dkvs-primary-server.sock"
   REPLICA_SOCKET_PATH = "/tmp/dkvs-replica-server.sock"
-  attr_accessor :file_store, :socket, :request_handler, :primary, :socket_path, :wal
+  attr_accessor :up, :file_store, :socket, :request_handler, :primary, :socket_path, :wal
 
   def initialize(primary:)
     self.primary = primary == "true" ? true : false
@@ -20,6 +20,7 @@ class Server
     self.socket_path = self.primary ? PRIMARY_SOCKET_PATH : REPLICA_SOCKET_PATH
     self.socket = UNIXServer.new(socket_path)
     self.request_handler = RequestHandler.new(self, wal)
+    self.up = true
   end
 
   def accept_connections
@@ -44,6 +45,8 @@ class Server
 
   def shut_down
     File.unlink(socket.path)
+    socket.close
+    self.up = false
   end
 
   def primary?

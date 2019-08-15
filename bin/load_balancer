@@ -16,8 +16,6 @@ Signal.trap("INT") {
 
 begin
   display = Display.new
-  load_balancer.connect_to_primary
-  load_balancer.connect_to_replica
   load_balancer.accept_connections do |client|
     # persistent connection
     loop do
